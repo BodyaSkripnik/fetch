@@ -10,27 +10,37 @@ async function fetchData() {
   } catch (error) {
     throw new Error("Response was not OK");
   }
+  /* fetch("https://64fc7173605a026163ae8034.mockapi.io/gallery")
+    .then((res) => res.json())
+    .catch((error) => {
+      throw new Error("Response was not OK");
+    }); */
 }
 
 fetchData()
-  .then((response) => createImages(response))
+  .then((data) => renderItems(data))
   .catch((error) => {
-    console.log("error");
+    content.innerText = "Something went wrong :-(";
   });
 
-function createImgTemplate(name, url) {
-  return `<div>
-            <h1 class="content-title">${name}</h1>
-            <div class="content__wrapper">${url}</div>
-          </div>`
+function createItem({ name, photos }) {
+  const images = photos.reduce(
+    (acc, url) => acc + `<img class="content__img" src="${url}"  alt="" />`,
+    ""
+  );
+  return `
+    <div>
+
+      <p class="content__title">${name}</p>
+      <div class="content__item">${images}</div>
+    </div>
+  `;
 }
 
-function createImages(response) {
-  response.forEach(({ name, photos }) => {
-    const urls = photos.reduce(
-      (acc, url) => acc + `<img class="photo" src="${url}"  alt="" />`,
-      ""
-    );
-    content.innerHTML += createImgTemplate(name, urls);
+function renderItems(data) {
+  let fragment = "";
+  data.forEach((item) => {
+    fragment += createItem(item);
   });
+  content.innerHTML = fragment;
 }
